@@ -269,7 +269,7 @@ function purge(message){
 function help(message){
 
     let msg = "!play <url_yt>: Agrega la song a la playlist\n" + 
-    "!skip: Salta la song que esta sonando\n" + 
+    "!skip <nro>: Salta la song que esta sonando\n" + 
     "!clear: Para y limpia lista de reproduccion\n" +
     "!stop: Para la cancion que esta sonando\n" +
     "!resume: Vuelve a reproducir la cancion que estaba sonando\n" +

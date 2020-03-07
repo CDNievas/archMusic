@@ -6,4 +6,5 @@ Simple music bot for Discord
 
 - [ ] Accept spotify playlist
 - [ ] !shuffle
+- [ ] !skip w/ number
 - [ ] !pause / !unpause

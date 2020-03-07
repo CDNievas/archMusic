@@ -170,15 +170,29 @@ function skip(message, serverQueue){
 
     if(!serverQueue) return;
 
-    let nextSong = serverQueue.songs[1];
+    let args = message.content.split(" ");
+    let songPos = 1;
+    
+    if(args.length >= 2){
+        songPos = Number(args[1]);
+    } 
+
+    if(songPos > serverQueue.songs.length){
+        serverQueue.textChannel.send("No existe esa cancion autista de mierda");
+        return;
+    }
+
+    let nextSong = serverQueue.songs[songPos-1];
 
     if(!nextSong){
         serverQueue.textChannel.send("No hay otra cancion despues rey");
     } else {
 
+        serverQueue.songs = serverQueue.songs.slice(songPos-1, serverQueue.songs.length);
+
         serverQueue.connection.dispatcher.end();
-        play(message.guild.id,nextSong);
         serverQueue.textChannel.send("Saltando la song br0");
+        play(message.guild.id,nextSong);
 
     }
 

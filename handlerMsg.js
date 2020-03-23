@@ -30,6 +30,8 @@ exports.analizar = function (message){
         resume(message, serverQueue);
     } else if (checkComm(message,"list")){
         list(message, serverQueue);
+    } else if (checkComm(message,"shuffle")){
+        shuffle(message, serverQueue);
     } else if (checkComm(message,"purge")){
         purge(message);
     } else if (checkComm(message,"help")){
@@ -100,7 +102,12 @@ async function add(message, serverQueue){
 
         songs = await ytMapList.toList(match[1]);
 
-        message.channel.send(songs.length + " temardos a la lista. Para ver todos los temas usa !list");
+        if (songs.length == 0) {
+            message.channel.send("Ocurrio un error y no puedo agregar los temas");
+            return;
+        } else {
+            message.channel.send(songs.length + " temardos a la lista. Para ver todos los temas usa !list");
+        }
 
 
     } else {
@@ -141,16 +148,23 @@ function play(guild, song){
 
     serverQueue.playing = true;
 
+
     const dispatcher = serverQueue.connection.play(ytdl(song.url))
+        .on("start", () =>{
+            serverQueue.textChannel.send("Estas escuchando: " + song.title);
+        })
         .on("finish", () => {
             serverQueue.songs.shift();
             play(guild, serverQueue.songs[0]);
         })
-        .on("error", error => console.error(error));
+        .on("error", error => {
+            serverQueue.songs.shift();
+            serverQueue.textChannel.send("No puedo reproducir '" + song.title + "' debido a " + error);
+            serverQueue.textChannel.send("Saltando la song con autismo");
+            play(guild, serverQueue.songs[0]);
+        });
 
     dispatcher.setVolumeLogarithmic(serverQueue.volume/5);
-
-    serverQueue.textChannel.send("Estas escuchando: " + song.title);
 
 }
 
@@ -177,7 +191,7 @@ function skip(message, serverQueue){
         songPos = Number(args[1]);
     } 
 
-    if(songPos > serverQueue.songs.length){
+    if(songPos > serverQueue.songs.length-1){
         serverQueue.textChannel.send("No existe esa cancion autista de mierda");
         return;
     }
@@ -189,10 +203,8 @@ function skip(message, serverQueue){
     } else {
 
         serverQueue.songs = serverQueue.songs.slice(songPos-1, serverQueue.songs.length);
-
         serverQueue.connection.dispatcher.end();
         serverQueue.textChannel.send("Saltando la song br0");
-        play(message.guild.id,nextSong);
 
     }
 
@@ -204,7 +216,7 @@ function stop(message, serverQueue){
 
     if(!serverQueue) return;
     if(!serverQueue.connection) return;
-    serverQueue.connection.dispatcher.end();
+    serverQueue.connection.dispatcher.pause();
 
     serverQueue.textChannel.send("Parando el carro b0eeeee");
 
@@ -214,18 +226,10 @@ function stop(message, serverQueue){
 function resume(message, serverQueue){
 
     if(!serverQueue) return;
+    if(!serverQueue.connection) return;
+    serverQueue.connection.dispatcher.resume();
 
-    let song = serverQueue.songs[0];
-
-    if(!song){
-        serverQueue.textChannel.send("Esta vacia la playlist retrasado");
-    } else {
-
-        serverQueue.connection.dispatcher.end();
-        play(message.guild.id,song);
-        serverQueue.textChannel.send("Resumiendo lo que se daba, ndeaaaaaaah");
-
-    }
+    serverQueue.textChannel.send("Resumiendo lo que se daba, ndeaaaaaaah");
 
 }
 
@@ -238,12 +242,35 @@ function list(message, serverQueue){
 
     let msg = "";
 
-    for (var i in serverQueue.songs){
-        msg = msg + i + "- " + serverQueue.songs[i].title + "\n";
+    let songs = serverQueue.songs;
+
+    for (var i in songs){
+
+        if(parseInt(i) === 0){
+            msg = msg + "** # - " + songs[i].title + "**\n";
+        } else {
+           msg = msg + i + "- " + songs[i].title + "\n"; 
+        }
+        
     }
 
-    message.channel.send("Playlist:");
+    message.channel.send("**__Playlist:__**");
     message.channel.send(msg);
+
+}
+
+function shuffle(message, serverQueue){
+
+    if(!serverQueue){
+        message.channel.send("No puedo mezclar nada si la lista esta vacia tarado mental");
+        return;
+    } 
+
+    let song = serverQueue.songs.shift();
+    serverQueue.songs.sort(() => Math.random() - 0.5);
+    serverQueue.songs.unshift(song);
+
+    message.channel.send("Lo deje mas mezclado que cenizas de judio en Auschwitz");
 
 }
 
@@ -262,8 +289,6 @@ function purge(message){
     }
     doPurge();
 
-
-
 }
 
 function help(message){
@@ -274,6 +299,7 @@ function help(message){
     "!stop: Para la cancion que esta sonando\n" +
     "!resume: Vuelve a reproducir la cancion que estaba sonando\n" +
     "!list: Muestra playlist\n" +
+    "!shuffle: Mezcla la playlist\n" +
     "!purge: Elimina mensajes del bot\n";
 
     message.channel.send(msg);

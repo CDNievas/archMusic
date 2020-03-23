@@ -13,9 +13,13 @@ exports.toList = function (videoId){
 
 	return new Promise((resolve, reject) => {
 
-		let songs = []
+		let songs = [];
 
 		request.get(api, (error, response, body) =>{
+
+			if(error){
+				return songs;
+			}
 
 			let json = JSON.parse(body);
 

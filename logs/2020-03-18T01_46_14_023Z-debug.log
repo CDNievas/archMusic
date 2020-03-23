@@ -1,0 +1,15 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'start' ]
+2 info using npm@6.13.4
+3 info using node@v12.16.1
+4 verbose run-script [ 'prestart', 'start', 'poststart' ]
+5 info lifecycle archmusic@1.0.0~prestart: archmusic@1.0.0
+6 info lifecycle archmusic@1.0.0~start: archmusic@1.0.0
+7 verbose lifecycle archmusic@1.0.0~start: unsafe-perm in lifecycle true
+8 verbose lifecycle archmusic@1.0.0~start: PATH: /usr/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/home/pi/Desktop/archMusic/node_modules/.bin:/home/pi/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+9 verbose lifecycle archmusic@1.0.0~start: CWD: /home/pi/Desktop/archMusic
+10 silly lifecycle archmusic@1.0.0~start: Args: [ '-c', 'node app.js' ]
+11 timing npm Completed in 50066ms
+12 error cb() never called!
+13 error This is an error with npm itself. Please report this error at:
+14 error <https://npm.community>

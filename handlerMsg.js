@@ -11,6 +11,8 @@ const prefix = "!";
 // Servers Queue
 const queues = new Map();
 
+exports.checkEmptyChannel = checkEmptyChannel;
+
 // Handler
 exports.analizar = function (message){
 
@@ -24,8 +26,8 @@ exports.analizar = function (message){
         skip(message, serverQueue);
     } else if (checkComm(message,"clear")){
         clear(message, serverQueue);
-    } else if (checkComm(message,"stop")){
-        stop(message, serverQueue);
+    } else if (checkComm(message,"pause")){
+        pause(message, serverQueue);
     } else if (checkComm(message,"resume")){
         resume(message, serverQueue);
     } else if (checkComm(message,"list")){
@@ -34,6 +36,8 @@ exports.analizar = function (message){
         shuffle(message, serverQueue);
     } else if (checkComm(message,"purge")){
         purge(message);
+    } else if (checkComm(message,"invite")){
+        invite(message);
     } else if (checkComm(message,"help")){
         help(message);
     } else if (checkComm(message,"")){
@@ -47,7 +51,6 @@ function checkComm(message,str){
 }
 
 // Functions
-
 async function add(message, serverQueue){
 
     let source = message.content.split(" ")[1];
@@ -148,7 +151,6 @@ function play(guild, song){
 
     serverQueue.playing = true;
 
-
     const dispatcher = serverQueue.connection.play(ytdl(song.url))
         .on("start", () =>{
             serverQueue.textChannel.send("Estas escuchando: " + song.title);
@@ -168,7 +170,6 @@ function play(guild, song){
 
 }
 
-
 function clear(message, serverQueue){
 
     if(!serverQueue) return;
@@ -179,6 +180,23 @@ function clear(message, serverQueue){
     serverQueue.textChannel.send("Playlist vacia como tu vida, al lobby pt");
 
 }
+
+function checkEmptyChannel(channel){
+
+    if(channel.members.size === 1){
+
+        serverQueue = queues.get(channel.guild.id);
+        
+        if(!serverQueue) return;
+
+        serverQueue.voiceChannel.leave();
+        queues.delete(channel.guild.id);
+        serverQueue.textChannel.send("Me voy a la re mierda nv");
+
+    }
+
+}
+
 
 function skip(message, serverQueue){
 
@@ -291,16 +309,25 @@ function purge(message){
 
 }
 
+function invite(message){
+
+    let msg = "Invitame a tu servidor usando este link http://arch.cdnapp.xyz/";
+    message.channel.send(msg);
+
+}
+
 function help(message){
 
     let msg = "!play <url_yt>: Agrega la song a la playlist\n" + 
     "!skip <nro>: Salta la song que esta sonando\n" + 
     "!clear: Para y limpia lista de reproduccion\n" +
-    "!stop: Para la cancion que esta sonando\n" +
+    "!pause: Para la cancion que esta sonando\n" +
     "!resume: Vuelve a reproducir la cancion que estaba sonando\n" +
     "!list: Muestra playlist\n" +
     "!shuffle: Mezcla la playlist\n" +
-    "!purge: Elimina mensajes del bot\n";
+    "!purge: Elimina mensajes del bot\n" + 
+    "!invite: Link de invitacion del bot\n" + 
+    "!help: Muestra comandos y descripcion\n";
 
     message.channel.send(msg);
 

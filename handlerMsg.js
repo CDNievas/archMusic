@@ -229,7 +229,7 @@ function skip(message, serverQueue){
 }
 
 
-function stop(message, serverQueue){
+function pause(message, serverQueue){
 
 
     if(!serverQueue) return;

@@ -1,3 +1,5 @@
+ATTENTION: DEPRECATED
+
 # Arch Music
 Simple music bot for Discord
 
